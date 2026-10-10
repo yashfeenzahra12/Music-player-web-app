@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player | My Project</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #141e30, #243b55);
+            color: white;
+        }
+
+        .music-player {
+            width: 100%;
+            max-width: 420px;
+            padding: 28px;
+            border-radius: 25px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(15px);
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 22px;
+        }
+
+        .cover {
+            width: 210px;
+            height: 210px;
+            margin: 0 auto 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3, #7b61ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 75px;
+            box-shadow: 0 0 30px rgba(255, 126, 179, 0.3);
+        }
+
+        .cover.playing {
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #song-title {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        #artist {
+            color: #d0d7e2;
+            margin-bottom: 20px;
+        }
+
+        .progress-container {
+            margin: 20px 0 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: #ff7eb3;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #d0d7e2;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 22px;
+            margin: 24px 0;
+        }
+
+        button {
+            border: none;
+            cursor: pointer;
+            color: white;
+            background: transparent;
+            font-size: 25px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.12);
+            opacity: 0.8;
+        }
+
+        .play-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            color: #243b55;
+            background: #ff7eb3;
+            font-size: 28px;
+        }
+
+        .volume {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .volume span {
+            font-size: 20px;
+        }
+
+        h2 {
+            text-align: left;
+            font-size: 18px;
+            margin: 24px 0 12px;
+        }
+
+        .playlist {
+            list-style: none;
+            text-align: left;
+        }
+
+        .playlist li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.07);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .playlist li:hover,
+        .playlist li.active {
+            background: rgba(255, 126, 179, 0.3);
+        }
+
+        .track-info {
+            min-width: 0;
+        }
+
+        .track-info strong,
+        .track-info small {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .track-info small {
+            margin-top: 4px;
+            color: #d0d7e2;
+        }
+
+        .track-number {
+            color: #ffb2d0;
+        }
+
+        .note {
+            margin-top: 18px;
+            font-size: 12px;
+            color: #d0d7e2;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 380px) {
+            .music-player {
+                padding: 20px;
+            }
+
+            .cover {
+                width: 170px;
+                height: 170px;
+            }
+
+            .controls {
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="music-player">
+        <h1>🎵 Music Player</h1>
+
+        <div class="cover" id="cover">♫</div>
+
+        <h2 id="song-title" style="text-align:center; margin:0 0 8px;">
+            Summer Vibes
+        </h2>
+
+        <p id="artist">Demo Artist</p>
+
+        <audio id="audio"></audio>
+
+        <div class="progress-container">
+            <input
+                type="range"
+                id="progress"
+                min="0"
+                max="100"
+                value="0"
+                aria-label="Song progress"
+            >
+
+            <div class="time">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="prev" aria-label="Previous song">⏮</button>
+            <button id="play" class="play-btn" aria-label="Play">▶</button>
+            <button id="next" aria-label="Next song">⏭</button>
+        </div>
+
+        <div class="volume">
+            <span>🔊</span>
+            <input
+                type="range"
+                id="volume"
+                min="0"
+                max="1"
+                step="0.01"
+                value="0.7"
+                aria-label="Volume"
+            >
+        </div>
+
+        <h2>My Playlist 🎶</h2>
+        <ul class="playlist" id="playlist"></ul>
+
+        <p class="note">
+            Enjoy your favorite tunes! Select a song from the playlist
+            or use the playback controls.
+        </p>
+    </main>
+
+    <script>
+        // Add your own audio file URLs below.
+        // These sample tracks use public demo audio.
+        const songs = [
+            {
+                title: "Summer Vibes",
+                artist: "Demo Artist",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+            },
+            {
+                title: "Relaxing Melody",
+                artist: "SoundHelix",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
+            },
+            {
+                title: "Night Drive",
+                artist: "SoundHelix",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
+            },
+            {
+                title: "Dream Journey",
+                artist: "SoundHelix",
+                src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3"
+            }
+        ];
+
+        const audio = document.getElementById("audio");
+        const playBtn = document.getElementById("play");
+        const prevBtn = document.getElementById("prev");
+        const nextBtn = document.getElementById("next");
+        const title = document.getElementById("song-title");
+        const artist = document.getElementById("artist");
+        const cover = document.getElementById("cover");
+        const progress = document.getElementById("progress");
+        const currentTime = document.getElementById("current-time");
+        const duration = document.getElementById("duration");
+        const volume = document.getElementById("volume");
+        const playlist = document.getElementById("playlist");
+
+        let songIndex = 0;
+        let isPlaying = false;
+
+        // Format seconds as minutes:seconds.
+        function formatTime(seconds) {
+            if (!Number.isFinite(seconds)) return "0:00";
+
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+
+            return `${mins}:${String(secs).padStart(2, "0")}`;
+        }
+
+        // Load the selected song.
+        function loadSong(index) {
+            songIndex = (index + songs.length) % songs.length;
+
+            const song = songs[songIndex];
+
+            title.textContent = song.title;
+            artist.textContent = song.artist;
+            audio.src = song.src;
+
+            progress.value = 0;
+            currentTime.textContent = "0:00";
+            duration.textContent = "0:00";
+
+            renderPlaylist();
+        }
+
+        // Start playback.
+        async function playSong() {
+            try {
+                await audio.play();
+                isPlaying = true;
+                updatePlayButton();
+            } catch (error) {
+                isPlaying = false;
+                updatePlayButton();
+                console.error("Playback failed:", error);
+                alert("Unable to play this track. Check your internet connection or audio URL.");
+            }
+        }
+
+        // Pause playback.
+        function pauseSong() {
+            audio.pause();
+            isPlaying = false;
+            updatePlayButton();
+        }
+
+        // Update the play/pause icon.
+        function updatePlayButton() {
+            playBtn.textContent = isPlaying ? "⏸" : "▶";
+            playBtn.setAttribute(
+                "aria-label",
+                isPlaying ? "Pause" : "Play"
+            );
+
+            cover.classList.toggle("playing", isPlaying);
+        }
+
+        // Move to the next track.
+        function nextSong() {
+            loadSong(songIndex + 1);
+            playSong();
+        }
+
+        // Move to the previous track.
+        function previousSong() {
+            loadSong(songIndex - 1);
+            playSong();
+        }
+
+        // Display the playlist.
+        function renderPlaylist() {
+            playlist.innerHTML = "";
+
+            songs.forEach((song, index) => {
+                const li = document.createElement("li");
+
+                if (index === songIndex) {
+                    li.classList.add("active");
+                }
+
+                const info = document.createElement("div");
+                info.className = "track-info";
+
+                const songName = document.createElement("strong");
+                songName.textContent = song.title;
+
+                const songArtist = document.createElement("small");
+                songArtist.textContent = song.artist;
+
+                info.append(songName, songArtist);
+
+                const number = document.createElement("span");
+                number.className = "track-number";
+                number.textContent =
+                    index === songIndex && isPlaying ? "♫" : String(index + 1);
+
+                li.append(info, number);
+
+                li.addEventListener("click", () => {
+                    loadSong(index);
+                    playSong();
+                });
+
+                playlist.appendChild(li);
+            });
+        }
+
+        // Play or pause when the main button is clicked.
+        playBtn.addEventListener("click", () => {
+            if (audio.paused) {
+                playSong();
+            } else {
+                pauseSong();
+            }
+        });
+
+        nextBtn.addEventListener("click", nextSong);
+        prevBtn.addEventListener("click", previousSong);
+
+        // Update the progress bar as the song plays.
+        audio.addEventListener("timeupdate", () => {
+            if (Number.isFinite(audio.duration) && audio.duration > 0) {
+                progress.value =
+                    (audio.currentTime / audio.duration) * 100;
+
+                currentTime.textContent = formatTime(audio.currentTime);
+                duration.textContent = formatTime(audio.duration);
+            }
+        });
+
+        // Seek to a selected position.
+        progress.addEventListener("input", () => {
+            if (Number.isFinite(audio.duration) && audio.duration > 0) {
+                audio.currentTime =
+                    (Number(progress.value) / 100) * audio.duration;
+            }
+        });
+
+        // Update duration when audio metadata loads.
+        audio.addEventListener("loadedmetadata", () => {
+            duration.textContent = formatTime(audio.duration);
+        });
+
+        // Change the volume.
+        volume.addEventListener("input", () => {
+            audio.volume = Number(volume.value);
+        });
+
+        // Automatically play the next song when the current one ends.
+        audio.addEventListener("ended", nextSong);
+
+        // Keep the interface synchronized with audio playback.
+        audio.addEventListener("play", () => {
+            isPlaying = true;
+            updatePlayButton();
+            renderPlaylist();
+        });
+
+        audio.addEventListener("pause", () => {
+            isPlaying = false;
+            updatePlayButton();
+            renderPlaylist();
+        });
+
+        // Initialize the music player.
+        audio.volume = Number(volume.value);
+        loadSong(0);
+    </script>
+
+</body>
+</html>
